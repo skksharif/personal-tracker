@@ -1,0 +1,567 @@
+@import "tailwindcss";
+
+/* -------------------------------------------------------------------------- */
+/* Theme variant                                                              */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Three theme states, matching how people actually use a journal at night:
+ *
+ *   data-theme="light"   explicit light, wins over the OS
+ *   data-theme="dark"    explicit dark, wins over the OS
+ *   (no attribute)       follow the OS
+ *
+ * Components should reach for semantic tokens (`bg-surface`, `text-muted`)
+ * rather than `dark:` utilities — the tokens already carry the theme, so a
+ * component written against them is correct in all three states for free.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* -------------------------------------------------------------------------- */
+/* Palette                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Light: warm white paper, deep charcoal ink. Warm rather than pure white so
+ * long reading sessions stay comfortable and the page reads as paper.
+ *
+ * Colour carries meaning, never decoration:
+ *   accent   primary actions and links
+ *   ai       AI assistance, everywhere and only there
+ *   success  completed        warning  in progress        danger  failed
+ */
+:root {
+  color-scheme: light;
+
+  /* Surfaces, from furthest back to nearest front. */
+  --canvas: #fbfaf8;
+  --surface: #ffffff;
+  --surface-sunken: #f4f2ef;
+  --surface-raised: #ffffff;
+
+  /* Ink. */
+  /*
+   * The ink ramp is contrast-bound, not taste-bound: every step clears 4.5:1
+   * against the *sunken* surface, the darkest of the three it can sit on.
+   * That puts the lower steps closer together than they would be by eye, so
+   * hierarchy below `ink-secondary` is carried by size and weight as much as
+   * by lightness. Changing one of these means re-measuring, not nudging.
+   */
+  --ink: #1c1b19;
+  --ink-secondary: #57544e;
+  --ink-muted: #66625a;
+  --ink-faint: #726e66;
+  --ink-inverted: #fbfaf8;
+
+  /* Lines. Barely there by design — whitespace does the separating. */
+  --line: #e7e3dd;
+  --line-strong: #d5d0c8;
+
+  /*
+   * The edge of an input or a secondary button. Separate from `--line` because
+   * it answers to WCAG 1.4.11: the boundary of a control has to clear 3:1
+   * against every surface it sits on, while a divider between paragraphs is
+   * decorative and should stay a hairline.
+   *
+   * Measured: 3.53 on surface, 3.38 on canvas, 3.16 on sunken.
+   */
+  --control-border: #8c8880;
+
+  /* Accent: a muted ink blue. Confident without being corporate. */
+  --accent: #2f5d8a;
+  --accent-hover: #264c72;
+  --accent-soft: #eaf0f6;
+  --accent-ink: #ffffff;
+
+  /* AI. Violet, used nowhere else, so its presence is always legible. */
+  --ai: #6b4f9e;
+  --ai-soft: #f1ecf9;
+
+  /* Status. */
+  --success: #3d7650;
+  --success-soft: #e9f2eb;
+  --warning: #8c611e;
+  --warning-soft: #f8f0e2;
+  --danger: #a34b43;
+  --danger-soft: #f8ebe9;
+
+  /* Focus. Always visible, never removed. */
+  --focus: #2f5d8a;
+
+  --shadow-sheet: 0 -8px 32px rgb(28 27 25 / 0.1);
+  --shadow-raised: 0 1px 3px rgb(28 27 25 / 0.06);
+
+  /*
+   * Chart palette.
+   *
+   * Separate from the interface tokens because charts answer to different
+   * constraints: a lightness band, a chroma floor, and colour-blind separation
+   * that are measured rather than judged. Every value here came out of the
+   * data-viz validator run against this mode's surface — changing one means
+   * re-running it, not nudging the hex.
+   *
+   * `chart-1..3` is an ordinal ramp (one hue, light → dark) for ordered
+   * categories such as easy/medium/hard. `chart-low`/`chart-high` are the poles
+   * of a diverging scale, with `chart-mid` as its neutral midpoint.
+   */
+  --chart-ink: #1f4a70;
+  --chart-1: #7ba3ca;
+  --chart-2: #4a7cab;
+  --chart-3: #1f4a70;
+  --chart-low: #b04a3f;
+  --chart-mid: #a8a49b;
+  --chart-high: #2f6fa8;
+  --chart-grid: #e7e3dd;
+}
+
+/* Dark: warm near-black, so it reads as dimmed paper rather than a terminal. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --canvas: #14130f;
+    --surface: #1c1b17;
+    --surface-sunken: #100f0c;
+    --surface-raised: #24221d;
+
+    --ink: #eeeae2;
+    --ink-secondary: #b5b0a5;
+    --ink-muted: #9f9a8f;
+    --ink-faint: #8b867b;
+    --ink-inverted: #14130f;
+
+    --line: #302d27;
+    --line-strong: #423e36;
+    --control-border: #6e6c61;
+
+    --accent: #8fb4d9;
+    --accent-hover: #a7c6e5;
+    --accent-soft: #1e2a35;
+    --accent-ink: #14130f;
+
+    --ai: #b39ddb;
+    --ai-soft: #241f2e;
+
+    --success: #7fb08e;
+    --success-soft: #1a241c;
+    --warning: #d4a960;
+    --warning-soft: #2a2318;
+    --danger: #d99289;
+    --danger-soft: #2c1e1c;
+
+    --focus: #8fb4d9;
+
+    --shadow-sheet: 0 -8px 32px rgb(0 0 0 / 0.5);
+    --shadow-raised: 0 1px 3px rgb(0 0 0 / 0.3);
+
+    /* Dark chart steps are chosen against the dark surface, never flipped. */
+    --chart-ink: #9fc4e2;
+    --chart-1: #3d6c96;
+    --chart-2: #6698c4;
+    --chart-3: #9fc4e2;
+    --chart-low: #c4675a;
+    --chart-mid: #8b867b;
+    --chart-high: #5896d2;
+    --chart-grid: #302d27;
+  }
+}
+
+/* The explicit choice, which must beat the media query in both directions. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --canvas: #14130f;
+  --surface: #1c1b17;
+  --surface-sunken: #100f0c;
+  --surface-raised: #24221d;
+
+  --ink: #eeeae2;
+  --ink-secondary: #b5b0a5;
+  --ink-muted: #9f9a8f;
+  --ink-faint: #8b867b;
+  --ink-inverted: #14130f;
+
+  --line: #302d27;
+  --line-strong: #423e36;
+  --control-border: #6e6c61;
+
+  --accent: #8fb4d9;
+  --accent-hover: #a7c6e5;
+  --accent-soft: #1e2a35;
+  --accent-ink: #14130f;
+
+  --ai: #b39ddb;
+  --ai-soft: #241f2e;
+
+  --success: #7fb08e;
+  --success-soft: #1a241c;
+  --warning: #d4a960;
+  --warning-soft: #2a2318;
+  --danger: #d99289;
+  --danger-soft: #2c1e1c;
+
+  --focus: #8fb4d9;
+
+  --shadow-sheet: 0 -8px 32px rgb(0 0 0 / 0.5);
+  --shadow-raised: 0 1px 3px rgb(0 0 0 / 0.3);
+
+  /* Dark chart steps are chosen against the dark surface, never flipped. */
+  --chart-ink: #9fc4e2;
+  --chart-1: #3d6c96;
+  --chart-2: #6698c4;
+  --chart-3: #9fc4e2;
+  --chart-low: #c4675a;
+  --chart-mid: #8b867b;
+  --chart-high: #5896d2;
+  --chart-grid: #302d27;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Token mapping                                                              */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * `inline` keeps the utilities pointing at the custom properties rather than
+ * inlining their values, which is what lets the theme switch at runtime.
+ */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-raised: var(--surface-raised);
+
+  --color-ink: var(--ink);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-ink-inverted: var(--ink-inverted);
+
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-control-border: var(--control-border);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+
+  --color-ai: var(--ai);
+  --color-ai-soft: var(--ai-soft);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --color-chart-ink: var(--chart-ink);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-low: var(--chart-low);
+  --color-chart-mid: var(--chart-mid);
+  --color-chart-high: var(--chart-high);
+  --color-chart-grid: var(--chart-grid);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /*
+   * Type scale. Deliberately short — five sizes cover the whole product.
+   * Body sits at 17px because this app is read, not scanned.
+   */
+  --text-meta: 0.8125rem; /* 13px — dates, counts, labels */
+  --text-meta--line-height: 1.4;
+  --text-small: 0.9375rem; /* 15px — secondary UI */
+  --text-small--line-height: 1.5;
+  --text-body: 1.0625rem; /* 17px — reading */
+  --text-body--line-height: 1.7;
+  --text-title: 1.375rem; /* 22px — entry titles */
+  --text-title--line-height: 1.35;
+  --text-page: 1.75rem; /* 28px — page titles */
+  --text-page--line-height: 1.25;
+
+  /* Spacing. A small set, used consistently, is what creates the calm. */
+  --spacing-gutter: 1.5rem;
+  --spacing-section: 2.5rem;
+  --spacing-page: 4rem;
+
+  /* Reading measure — long-form content never exceeds this. */
+  --container-reading: 38rem;
+  --container-content: 45rem;
+
+  --radius-sheet: 1rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Base                                                                       */
+/* -------------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /*
+   * One focus style for the whole application. It is never removed — only
+   * hidden for pointer interaction, where it would be noise.
+   */
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Headings inherit weight from context rather than shouting by default. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 500;
+    letter-spacing: -0.011em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--accent-soft);
+    color: var(--ink);
+  }
+
+  /* Placeholders are hints, not content. */
+  ::placeholder {
+    color: var(--ink-faint);
+  }
+
+  /* Native controls follow the theme. */
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  dialog::backdrop {
+    background-color: rgb(28 27 25 / 0.32);
+    backdrop-filter: blur(2px);
+  }
+
+  /*
+   * Overlays enter with a short slide; they do not animate out. Movement here
+   * communicates where the panel came from, which is worth the motion — a
+   * dismissal animation only delays the user. `@starting-style` is what makes
+   * this work on an element that goes straight from `display: none` to open.
+   * The reduced-motion block at the bottom of this file neutralises all of it.
+   */
+  .app-sheet {
+    transition:
+      translate 200ms ease-out,
+      opacity 200ms ease-out;
+    translate: 0 0;
+    opacity: 1;
+  }
+
+  @starting-style {
+    .app-sheet[open] {
+      translate: 0 100%;
+      opacity: 0;
+    }
+  }
+
+  @media (min-width: 640px) {
+    @starting-style {
+      .app-sheet[open] {
+        translate: 100% 0;
+        opacity: 1;
+      }
+    }
+  }
+
+  .app-dialog {
+    transition:
+      scale 150ms ease-out,
+      opacity 150ms ease-out;
+    scale: 1;
+    opacity: 1;
+  }
+
+  @starting-style {
+    .app-dialog[open] {
+      scale: 0.97;
+      opacity: 0;
+    }
+  }
+}
+
+@layer utilities {
+  /*
+   * Long-form journal content: serif, generous leading, constrained measure.
+   * Applied to diary bodies and notes, never to UI chrome.
+   */
+  .prose-journal {
+    font-family: var(--font-serif);
+    font-size: var(--text-body);
+    line-height: 1.75;
+    color: var(--ink);
+  }
+
+  .prose-journal > * + * {
+    margin-top: 1.25em;
+  }
+
+  .prose-journal h2,
+  .prose-journal h3 {
+    font-family: var(--font-sans);
+    margin-top: 2em;
+  }
+
+  .prose-journal a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .prose-journal code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background-color: var(--surface-sunken);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+
+  .prose-journal blockquote {
+    border-left: 2px solid var(--line-strong);
+    padding-left: 1em;
+    color: var(--ink-secondary);
+    font-style: italic;
+  }
+
+  .prose-journal img {
+    border-radius: 4px;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /*
+   * Syntax highlighting.
+   *
+   * Written against the design tokens rather than importing a highlight.js
+   * theme, so code follows the app's light and dark palettes instead of
+   * carrying a third colour scheme of its own. Restrained on purpose: enough
+   * contrast to scan a snippet, not a rainbow.
+   */
+  .hljs-comment,
+  .hljs-quote {
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-literal,
+  .hljs-section,
+  .hljs-doctag,
+  .hljs-name {
+    color: var(--ai);
+  }
+
+  .hljs-string,
+  .hljs-regexp,
+  .hljs-addition,
+  .hljs-attribute,
+  .hljs-meta .hljs-string {
+    color: var(--success);
+  }
+
+  .hljs-number,
+  .hljs-symbol,
+  .hljs-bullet,
+  .hljs-link,
+  .hljs-selector-attr,
+  .hljs-selector-pseudo,
+  .hljs-template-variable,
+  .hljs-variable {
+    color: var(--warning);
+  }
+
+  .hljs-title,
+  .hljs-title.class_,
+  .hljs-title.function_,
+  .hljs-built_in,
+  .hljs-class .hljs-title {
+    color: var(--accent);
+  }
+
+  .hljs-attr,
+  .hljs-property,
+  .hljs-params {
+    color: var(--ink-secondary);
+  }
+
+  .hljs-deletion {
+    color: var(--danger);
+  }
+
+  .hljs-emphasis {
+    font-style: italic;
+  }
+
+  .hljs-strong {
+    font-weight: 600;
+  }
+
+  /* Inline code keeps the tinted chip; blocks own their own surface. */
+  .prose-journal pre code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* Visible only to screen readers, until focused. */
+  .sr-only-focusable:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/*
+ * Reduced motion is a preference, not a suggestion. Transitions are cut to a
+ * value that still commits state changes without animating them.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
