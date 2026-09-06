@@ -91,6 +91,7 @@ export function AskJourney() {
 
       <div className="mt-4 flex items-center gap-2">
         <Button
+          loading={pending}
           variant="ai"
           onClick={ask}
           disabled={pending || question.trim().length < 3}
@@ -98,7 +99,7 @@ export function AskJourney() {
           {pending ? "Reading your journey…" : "Ask"}
         </Button>
         {answer ? (
-          <Button onClick={ask} disabled={pending}>
+          <Button onClick={ask} loading={pending}>
             Ask again
           </Button>
         ) : null}

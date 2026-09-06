@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Page } from "@/components/shell/app-shell";
+import { DeleteTopic } from "@/components/technical/delete-topic";
 import { TopicEditor } from "@/components/technical/topic-editor";
 import { Separator } from "@/components/ui/surface";
 import { Tag } from "@/components/ui/tag";
@@ -22,13 +23,19 @@ export default async function TopicPage({
 
   return (
     <Page width="reading">
-      <nav className="mb-6">
+      <nav className="mb-6 flex items-center justify-between">
         <Link
           href="/technical/dsa"
           className="text-meta text-ink-muted hover:text-ink transition-colors"
         >
           ← All topics
         </Link>
+        <DeleteTopic
+          id={topic.id}
+          name={topic.name}
+          problemCount={topic.problemCount}
+          implicit={topic.implicit}
+        />
       </nav>
 
       <header>

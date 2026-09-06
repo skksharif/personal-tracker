@@ -316,6 +316,26 @@
   }
 
   /*
+   * Anything clickable says so under the cursor.
+   *
+   * A `<button>` shows the arrow cursor by default and Tailwind's reset does
+   * not change that, so without this rule every control in the app reads as
+   * inert. Stated once here rather than remembered on each component — a
+   * button added next month is covered without anyone thinking about it.
+   */
+  button:not(:disabled),
+  summary,
+  [role="button"]:not([aria-disabled="true"]),
+  label:has(> input[type="checkbox"], > input[type="radio"]) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  /*
    * One focus style for the whole application. It is never removed — only
    * hidden for pointer interaction, where it would be noise.
    */
@@ -549,6 +569,51 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
+}
+
+/*
+ * The route-transition bar.
+ *
+ * It creeps towards 90% and stops. It never reaches the end, because the app
+ * does not know how long the read will take and a bar that fills to 100% and
+ * then waits is a lie. The fade-in is delayed so a navigation that resolves in
+ * 150ms never flashes a bar at all.
+ *
+ * Under reduced motion the global rule below collapses the animation, which
+ * leaves the bar simply present — still the right signal, without the travel.
+ */
+@keyframes route-progress-grow {
+  0% {
+    width: 0%;
+  }
+  25% {
+    width: 32%;
+  }
+  55% {
+    width: 62%;
+  }
+  100% {
+    width: 90%;
+  }
+}
+
+@keyframes route-progress-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.route-progress {
+  /*
+   * Zero width up front matters: a block element defaults to the full width of
+   * its parent, so without this the bar paints edge-to-edge for the 120ms
+   * before the animation takes over.
+   */
+  width: 0;
+  opacity: 0;
+  animation:
+    route-progress-in 150ms ease 120ms forwards,
+    route-progress-grow 6s ease-out 120ms forwards;
 }
 
 /*

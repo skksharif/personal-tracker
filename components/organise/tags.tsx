@@ -142,6 +142,7 @@ function RenameDialog({
             Cancel
           </Button>
           <Button
+            loading={pending}
             variant="primary"
             onClick={submit}
             disabled={pending || unchanged}
@@ -206,7 +207,12 @@ function RemoveDialog({
           <Button variant="ghost" onClick={onClose} disabled={pending}>
             Cancel
           </Button>
-          <Button variant="danger" onClick={submit} disabled={pending}>
+          <Button
+            loading={pending}
+            variant="danger"
+            onClick={submit}
+            disabled={pending}
+          >
             {pending ? "Removing…" : "Remove tag"}
           </Button>
         </>

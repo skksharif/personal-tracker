@@ -54,7 +54,12 @@ function Report<T>({
       <p className="text-small text-ink-muted">{disclosure}</p>
 
       <div className="mt-4 flex gap-2">
-        <Button variant="ai" onClick={execute} disabled={pending}>
+        <Button
+          loading={pending}
+          variant="ai"
+          onClick={execute}
+          disabled={pending}
+        >
           {pending ? pendingLabel : result ? "Run again" : runLabel}
         </Button>
       </div>

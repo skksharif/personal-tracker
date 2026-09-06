@@ -136,7 +136,12 @@ export function AddProblem() {
         ) : null}
 
         <div className="flex gap-2">
-          <Button type="submit" variant="primary" disabled={pending}>
+          <Button
+            loading={pending}
+            type="submit"
+            variant="primary"
+            disabled={pending}
+          >
             {pending ? "Adding…" : "Add problem"}
           </Button>
           <Button onClick={() => setOpen(false)} disabled={pending}>
@@ -332,7 +337,13 @@ export function AddAttempt({ problem }: { problem: Problem }) {
         </Field>
 
         <div className="flex gap-2">
-          <Button type="submit" variant="primary" size="sm" disabled={pending}>
+          <Button
+            loading={pending}
+            type="submit"
+            variant="primary"
+            size="sm"
+            disabled={pending}
+          >
             {pending ? "Saving…" : "Record attempt"}
           </Button>
           <Button size="sm" onClick={() => setOpen(false)} disabled={pending}>
@@ -430,6 +441,7 @@ export function DeleteProblem({ problem }: { problem: Problem }) {
               Cancel
             </Button>
             <Button
+              loading={pending}
               size="sm"
               variant="danger"
               onClick={remove}

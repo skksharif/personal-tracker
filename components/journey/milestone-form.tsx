@@ -92,7 +92,12 @@ export function AddMilestone({ today }: { today: string }) {
         ) : null}
 
         <div className="flex gap-2">
-          <Button type="submit" variant="primary" disabled={pending}>
+          <Button
+            loading={pending}
+            type="submit"
+            variant="primary"
+            disabled={pending}
+          >
             {pending ? "Saving…" : "Add milestone"}
           </Button>
           <Button onClick={() => setOpen(false)} disabled={pending}>
@@ -181,7 +186,13 @@ export function MilestoneActions({ milestone }: { milestone: Milestone }) {
         ) : null}
 
         <div className="flex gap-2">
-          <Button type="submit" variant="primary" size="sm" disabled={pending}>
+          <Button
+            loading={pending}
+            type="submit"
+            variant="primary"
+            size="sm"
+            disabled={pending}
+          >
             {pending ? "Saving…" : "Save"}
           </Button>
           <Button
@@ -217,6 +228,7 @@ export function MilestoneActions({ milestone }: { milestone: Milestone }) {
               Cancel
             </Button>
             <Button
+              loading={deleting}
               size="sm"
               variant="danger"
               onClick={remove}

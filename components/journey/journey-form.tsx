@@ -92,7 +92,12 @@ export function JourneyForm({ journey }: { journey: Journey }) {
         </p>
       ) : null}
 
-      <Button type="submit" variant="primary" disabled={pending}>
+      <Button
+        loading={pending}
+        type="submit"
+        variant="primary"
+        disabled={pending}
+      >
         {pending ? "Saving…" : "Save journey"}
       </Button>
     </form>
@@ -124,7 +129,7 @@ export function RebuildIndex() {
   };
 
   return (
-    <Button onClick={rebuild} disabled={pending}>
+    <Button loading={pending} onClick={rebuild} disabled={pending}>
       {pending ? "Rebuilding…" : "Rebuild index"}
     </Button>
   );

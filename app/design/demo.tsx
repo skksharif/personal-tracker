@@ -119,6 +119,33 @@ export function DesignSystemDemo() {
             <BookmarkIcon />
           </IconButton>
         </div>
+
+        {/*
+          The waiting state. The spinner takes the icon slot rather than being
+          added beside the label, so pressing a button never changes its width
+          and shifts the row.
+        */}
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Button variant="primary" loading>
+            Saving…
+          </Button>
+          <Button loading>Working…</Button>
+          <Button variant="ai" loading>
+            Reading your journey…
+          </Button>
+          <Button size="sm" variant="danger" loading>
+            Deleting…
+          </Button>
+          <IconButton label="Saving" loading>
+            <BookmarkIcon />
+          </IconButton>
+        </div>
+
+        <p className="text-meta text-ink-muted mt-3">
+          A button in this state is disabled and carries{" "}
+          <code className="font-mono">aria-busy</code>, so a slow save cannot be
+          submitted twice.
+        </p>
       </Section>
 
       <Section title="Form controls">

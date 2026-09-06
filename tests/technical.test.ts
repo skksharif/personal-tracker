@@ -549,3 +549,48 @@ describe("index rebuild covers every technical type", () => {
     expect(await fsp.readFile(indexFile, "utf8")).toBe(incremental);
   });
 });
+
+describe("deleting a topic", () => {
+  /*
+   * A topic record holds only the status and the notes. Deleting it must not
+   * reach the problems filed under it — which is exactly what the dialog
+   * promises the user, so it is worth a test rather than a reading of the code.
+   */
+  it("clears the notes and status but keeps the problems", async () => {
+    const problem = await problems.createProblem({
+      name: "Longest Substring Without Repeating Characters",
+      date: "2026-08-03",
+      topics: ["sliding-window"],
+    });
+
+    await topics.saveTopic("sliding-window", {
+      name: "sliding-window",
+      status: "learning",
+      notes: "Shrink from the left.",
+    });
+
+    expect((await topics.summariseTopic("sliding-window"))?.notes).toBe(
+      "Shrink from the left.",
+    );
+
+    await topics.deleteTopic("sliding-window");
+
+    const after = await topics.summariseTopic("sliding-window");
+
+    // The topic still exists, because a problem still names it — it is simply
+    // back to having nothing written about it.
+    expect(after?.implicit).toBe(true);
+    expect(after?.notes).toBe("");
+    expect(after?.status).toBe("not-started");
+    expect(after?.problemCount).toBe(1);
+
+    expect(await problems.getProblem(problem.id)).not.toBeNull();
+  });
+
+  it("leaves nothing behind for a topic no problem names", async () => {
+    await topics.saveTopic("tries", { name: "tries", notes: "Prefix trees." });
+    await topics.deleteTopic("tries");
+
+    expect(await topics.summariseTopic("tries")).toBeNull();
+  });
+});

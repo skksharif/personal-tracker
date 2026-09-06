@@ -146,7 +146,8 @@ export function AiPanel<T>({
               size="sm"
               variant={result?.status === "success" ? "secondary" : "ai"}
               onClick={execute}
-              disabled={pending || accepting || runDisabled}
+              loading={pending}
+              disabled={accepting || runDisabled}
             >
               {pending
                 ? "Working…"
@@ -157,6 +158,7 @@ export function AiPanel<T>({
 
             {onAccept && result?.status === "success" ? (
               <Button
+                loading={accepting}
                 size="sm"
                 variant="ai"
                 onClick={accept}

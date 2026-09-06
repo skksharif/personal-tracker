@@ -187,6 +187,23 @@ export function InterviewSession({ interview }: { interview: Interview }) {
             One interviewer&rsquo;s reading of one conversation. It is a
             practice signal, not a verdict.
           </p>
+
+          {/*
+            A finished interview needs a way out too. The reply box carries the
+            delete while one is in progress, and it disappears with the
+            evaluation — which left a completed transcript with no way to
+            remove it at all.
+          */}
+          <div className="border-line border-t pt-4">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-ink-muted hover:text-danger"
+              onClick={() => setConfirming(true)}
+            >
+              Delete this interview
+            </Button>
+          </div>
         </Surface>
       ) : (
         <div className="mt-section">
@@ -200,6 +217,7 @@ export function InterviewSession({ interview }: { interview: Interview }) {
           />
           <div className="mt-3 flex gap-2">
             <Button
+              loading={pending}
               variant="ai"
               onClick={send}
               disabled={pending || !answer.trim()}
@@ -228,8 +246,10 @@ export function InterviewSession({ interview }: { interview: Interview }) {
           </>
         }
       >
-        The whole transcript will be removed from disk. If you want to keep it
-        for later, leave it instead — an unfinished interview is still a record.
+        The whole transcript will be removed from disk.{" "}
+        {session.finished
+          ? "The evaluation goes with it."
+          : "If you want to keep it for later, leave it instead — an unfinished interview is still a record."}
       </Dialog>
     </div>
   );

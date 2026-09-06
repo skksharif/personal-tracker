@@ -51,7 +51,7 @@ export function LoadMore({
 
       {cursor ? (
         <div className="mt-8 flex flex-col items-center gap-2">
-          <Button onClick={loadMore} disabled={pending}>
+          <Button loading={pending} onClick={loadMore} disabled={pending}>
             {pending ? "Loading…" : "Load more"}
           </Button>
           {error ? (

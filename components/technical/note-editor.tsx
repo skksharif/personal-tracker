@@ -273,7 +273,13 @@ export function NewNoteButton({
   };
 
   return (
-    <Button variant="primary" size="sm" onClick={create} disabled={pending}>
+    <Button
+      loading={pending}
+      variant="primary"
+      size="sm"
+      onClick={create}
+      disabled={pending}
+    >
       {pending ? "Opening…" : label}
     </Button>
   );
@@ -323,6 +329,7 @@ export function DeleteNoteButton({
               Cancel
             </Button>
             <Button
+              loading={pending}
               size="sm"
               variant="danger"
               onClick={remove}

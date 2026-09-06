@@ -24,7 +24,7 @@ import {
   updateSession,
   type SessionInput,
 } from "@/lib/storage/sessions";
-import { saveTopic } from "@/lib/storage/topics";
+import { deleteTopic, saveTopic } from "@/lib/storage/topics";
 import { toActionState, type ActionResult } from "@/app/actions/shared";
 
 /**
@@ -213,6 +213,32 @@ export async function deleteSessionAction(id: string): Promise<ActionResult> {
     revalidatePath("/technical/sessions");
     revalidatePath("/journey/timeline");
     return { status: "success", message: "Session deleted" };
+  } catch (error) {
+    return toActionState(error);
+  }
+}
+
+/**
+ * Delete a topic's record.
+ *
+ * A topic file holds only what the user wrote about it — its status and its
+ * notes. The problems that carry the topic are separate records and are not
+ * touched, so the topic itself reappears with an empty status for as long as
+ * a problem still names it. The UI says exactly that rather than leaving the
+ * user to discover it.
+ */
+export async function deleteTopicAction(id: string): Promise<ActionResult> {
+  try {
+    await deleteTopic(id);
+
+    revalidatePath("/technical/dsa");
+    revalidatePath(`/technical/dsa/${id}`);
+    revalidatePath("/analytics/topics");
+
+    return {
+      status: "success",
+      message: "Notes and status cleared. Your problems are untouched.",
+    };
   } catch (error) {
     return toActionState(error);
   }

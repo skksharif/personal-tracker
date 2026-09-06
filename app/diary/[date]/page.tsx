@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { EntryEditor } from "@/components/diary/editor";
+import { DeleteEntryButton } from "@/components/diary/entry-collection";
 import { Page } from "@/components/shell/app-shell";
 import { BookmarkButton } from "@/components/organise/bookmark-button";
 import { formatDay, isValidDay, today } from "@/lib/dates";
@@ -53,8 +54,11 @@ export default async function DiaryDayPage({
               Today
             </Link>
           ) : null}
-          {/* A day with nothing written has no entry to star yet. */}
+          {/* A day with nothing written has no entry to star or delete yet. */}
           {entry ? <BookmarkButton id={date} initial={bookmarked} /> : null}
+          {entry ? (
+            <DeleteEntryButton type="diary" id={date} title={entry.title} />
+          ) : null}
         </div>
       </nav>
 

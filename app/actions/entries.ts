@@ -6,6 +6,7 @@ import {
   ENTRY_CONFIG,
   createEntry,
   deleteEntry,
+  removeMedia,
   updateEntry,
   type EntryInput,
   type WrittenEntryType,
@@ -81,6 +82,35 @@ export async function deleteEntryAction(
     await deleteEntry(type, id);
     revalidateEntry(type, id);
     return { status: "success", message: "Entry deleted" };
+  } catch (error) {
+    return toActionState(error);
+  }
+}
+
+/**
+ * Remove one image from an entry.
+ *
+ * Deliberately more than a file delete: the media record, the markdown that
+ * displayed it, and the file itself all go together, or the entry is left
+ * showing a broken image.
+ */
+export async function deleteMediaAction(
+  type: WrittenEntryType,
+  id: string,
+  mediaPath: string,
+): Promise<ActionResult> {
+  try {
+    const updated = await removeMedia(type, id, mediaPath);
+
+    if (!updated) {
+      return {
+        status: "success",
+        message: "That image was already gone.",
+      };
+    }
+
+    revalidateEntry(type, id);
+    return { status: "success", message: "Image removed" };
   } catch (error) {
     return toActionState(error);
   }

@@ -33,7 +33,7 @@ export function AiCheck({ configured }: { configured: boolean }) {
       </p>
 
       <div className="mt-4">
-        <Button onClick={run} disabled={pending}>
+        <Button loading={pending} onClick={run} disabled={pending}>
           {pending ? "Checking…" : "Check AI connection"}
         </Button>
       </div>

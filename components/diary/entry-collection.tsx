@@ -44,7 +44,13 @@ export function NewEntryButton({
   };
 
   return (
-    <Button variant="primary" size="sm" onClick={create} disabled={pending}>
+    <Button
+      loading={pending}
+      variant="primary"
+      size="sm"
+      onClick={create}
+      disabled={pending}
+    >
       {pending ? "Opening…" : label}
     </Button>
   );
@@ -72,7 +78,7 @@ export function DeleteEntryButton({
 
     if (result.status === "success") {
       show("Entry deleted", "success");
-      router.push(`/diary/${collectionPath(type)}`);
+      router.push(`/diary/${collectionPath(type)}`.replace(/\/$/, ""));
     } else {
       show(result.message, "danger");
     }
@@ -94,6 +100,7 @@ export function DeleteEntryButton({
               Cancel
             </Button>
             <Button
+              loading={pending}
               size="sm"
               variant="danger"
               onClick={remove}
@@ -112,10 +119,19 @@ export function DeleteEntryButton({
   );
 }
 
+/**
+ * The list a type belongs to, for the redirect after a delete.
+ *
+ * Diary is the empty string on purpose: a day lives directly under `/diary`,
+ * so deleting one returns to the list of days rather than to a sub-collection.
+ */
+const COLLECTION_PATH: Record<WrittenEntryType, string> = {
+  diary: "",
+  reflection: "reflections",
+  experience: "experiences",
+  letter: "future",
+};
+
 function collectionPath(type: WrittenEntryType): string {
-  return type === "reflection"
-    ? "reflections"
-    : type === "experience"
-      ? "experiences"
-      : "future";
+  return COLLECTION_PATH[type];
 }

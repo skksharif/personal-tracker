@@ -122,7 +122,12 @@ export function AddSession() {
         </Field>
 
         <div className="flex gap-2">
-          <Button type="submit" variant="primary" disabled={pending}>
+          <Button
+            loading={pending}
+            type="submit"
+            variant="primary"
+            disabled={pending}
+          >
             {pending ? "Saving…" : "Record session"}
           </Button>
           <Button onClick={() => setOpen(false)} disabled={pending}>
@@ -166,6 +171,7 @@ export function DeleteSession({ id }: { id: string }) {
               Cancel
             </Button>
             <Button
+              loading={pending}
               size="sm"
               variant="danger"
               onClick={remove}

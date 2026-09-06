@@ -465,6 +465,90 @@ async function referencedPaths(): Promise<Set<string>> {
   return used;
 }
 
+/**
+ * Take the markdown that displays one image out of a body.
+ *
+ * Removing the record but leaving `![](…)` behind would turn the entry into a
+ * broken image, which is a worse outcome than either keeping it or removing
+ * it properly. The blank lines the image was sitting between go with it, so
+ * the paragraphs close up instead of leaving a hole — and only there: the
+ * rest of the author's spacing is not touched.
+ */
+export function stripImageMarkdown(body: string, mediaPath: string): string {
+  const escaped = mediaPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  const image = new RegExp(
+    String.raw`[ \t]*!\[[^\]]*\]\(\s*${escaped}\s*(?:"[^"]*")?\)[ \t]*`,
+    "g",
+  );
+
+  /*
+   * A sentinel keeps the surrounding-newline handling local to each
+   * removal, so blank lines elsewhere in the entry are left exactly as
+   * written. NUL cannot occur in a Markdown file this app wrote, and it is
+   * written as an escape so this file stays plain text.
+   */
+  return body
+    .replace(image, "\u0000")
+    .replace(/\n*\u0000\n*/g, (gap) =>
+      gap.startsWith("\n") && gap.endsWith("\n") ? "\n\n" : "",
+    )
+    .replace(/\u0000/g, "");
+}
+
+/**
+ * Remove one image from an entry.
+ *
+ * Three things have to happen together or the journal ends up inconsistent:
+ * the media record goes, the markdown that displayed it goes, and the file
+ * goes — the last only once nothing else in the journal points at it.
+ *
+ * Returns the updated entry, or `null` if the entry or the image was already
+ * gone. Deleting something twice is not an error worth surfacing.
+ */
+export async function removeMedia(
+  type: WrittenEntryType,
+  id: string,
+  mediaPath: string,
+): Promise<Entry | null> {
+  const file = fileOf(type, id);
+
+  const updated = await withLock(file, async () => {
+    const existing = await readMarkdown(file, entryFrontmatterSchema);
+    if (!existing) return null;
+
+    const media = existing.frontmatter.media.filter(
+      (item) => item.path !== mediaPath,
+    );
+    if (media.length === existing.frontmatter.media.length) return null;
+
+    return saveEntry(
+      type,
+      id,
+      {
+        ...existing.frontmatter,
+        media,
+        updatedAt: new Date().toISOString(),
+      },
+      stripImageMarkdown(existing.body, mediaPath),
+    );
+  });
+
+  if (!updated) return null;
+
+  // Checked after the write, so the reference just removed is not counted.
+  const stillUsed = await referencedPaths();
+  if (!stillUsed.has(mediaPath)) {
+    try {
+      await deleteImage(mediaPath);
+    } catch (error) {
+      console.warn(`[entries] couldn't remove ${mediaPath}`, error);
+    }
+  }
+
+  return updated;
+}
+
 /** Store an AI reflection alongside the entry. Never touches the body. */
 export async function saveAiReflection(
   type: WrittenEntryType,

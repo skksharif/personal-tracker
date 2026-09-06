@@ -76,6 +76,7 @@ export function MediaPicker({
       />
 
       <Button
+        loading={uploading}
         size="sm"
         variant="ghost"
         disabled={disabled || uploading}

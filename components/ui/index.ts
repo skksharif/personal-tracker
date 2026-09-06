@@ -1,4 +1,4 @@
-export { Button, IconButton } from "@/components/ui/button";
+export { Button, IconButton, Spinner } from "@/components/ui/button";
 export type { ButtonProps, IconButtonProps } from "@/components/ui/button";
 
 export {

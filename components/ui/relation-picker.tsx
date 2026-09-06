@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { searchIndexAction } from "@/app/actions/search";
+import { Spinner } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { Tag } from "@/components/ui/tag";
 import type { IndexRecord } from "@/lib/storage/index-store";
@@ -118,7 +119,10 @@ export function RelationPicker({
       {query.trim().length >= 2 ? (
         <div className="border-line bg-surface overflow-hidden rounded-md border">
           {searching && results.length === 0 ? (
-            <p className="text-meta text-ink-muted p-3">Looking…</p>
+            <p className="text-meta text-ink-muted flex items-center gap-2 p-3">
+              <Spinner />
+              Looking…
+            </p>
           ) : results.length === 0 ? (
             <p className="text-meta text-ink-muted p-3">
               Nothing matches. Only things already recorded can be linked.
