@@ -1,0 +1,21 @@
+# Render Blueprint
+#
+# This creates a small Cron Job that keeps a free Render web service from
+# becoming idle. During the first Blueprint setup, Render asks for
+# KEEPALIVE_URL. Set it to:
+#   https://<your-web-service>.onrender.com/api/health
+#
+# A cron job is a separate paid Render service (minimum $1/month). It only
+# prevents idle spin-down; journal data still requires a persistent disk or a
+# database because a free web service filesystem is ephemeral.
+services:
+  - type: cron
+    name: aimforamazon-keepalive
+    runtime: node
+    plan: 0.5c-512mb
+    schedule: "*/10 * * * *"
+    buildCommand: "true"
+    startCommand: 'curl --fail --silent --show-error --max-time 30 "$KEEPALIVE_URL" > /dev/null'
+    envVars:
+      - key: KEEPALIVE_URL
+        sync: false
